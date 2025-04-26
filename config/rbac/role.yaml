@@ -1,0 +1,32 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: manager-role
+rules:
+- apiGroups:
+  - security.boanlab.com
+  resources:
+  - kubefortpolicies
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - security.boanlab.com
+  resources:
+  - kubefortpolicies/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - security.boanlab.com
+  resources:
+  - kubefortpolicies/status
+  verbs:
+  - get
+  - patch
+  - update

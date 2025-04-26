@@ -1,0 +1,206 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.17.1
+  name: kubefortpolicies.security.boanlab.com
+spec:
+  group: security.boanlab.com
+  names:
+    kind: KubeFortPolicy
+    listKind: KubeFortPolicyList
+    plural: kubefortpolicies
+    shortNames:
+    - kfp
+    singular: kubefortpolicy
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    - jsonPath: .spec.action
+      name: Action
+      priority: 10
+      type: string
+    - jsonPath: .spec.selector.matchLabels
+      name: Selector
+      priority: 10
+      type: string
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: KubeFortPolicy is the Schema for the kubefortpolicies API.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: KubeFortPolicySpec defines the desired state of KubeFortPolicy.
+            properties:
+              action:
+                enum:
+                - Allow
+                - Audit
+                - Block
+                type: string
+              file:
+                items:
+                  properties:
+                    dir:
+                      pattern: ^/
+                      type: string
+                    fromSource:
+                      items:
+                        properties:
+                          name:
+                            pattern: ^[^/]+$
+                            type: string
+                          path:
+                            pattern: ^/
+                            type: string
+                        required:
+                        - name
+                        - path
+                        type: object
+                      type: array
+                    name:
+                      pattern: ^[^/]+$
+                      type: string
+                    path:
+                      pattern: ^/
+                      type: string
+                    readOnly:
+                      type: boolean
+                    recursive:
+                      type: boolean
+                  type: object
+                type: array
+              network:
+                items:
+                  properties:
+                    direction:
+                      enum:
+                      - ingress
+                      - egress
+                      type: string
+                    fromSource:
+                      items:
+                        properties:
+                          name:
+                            pattern: ^[^/]+$
+                            type: string
+                          path:
+                            pattern: ^/
+                            type: string
+                        required:
+                        - name
+                        - path
+                        type: object
+                      type: array
+                    ipBlock:
+                      properties:
+                        cidr:
+                          pattern: ^[0-9.]+/[0-9]+$
+                          type: string
+                        except:
+                          description: |-
+                            Except is a list of CIDR ranges that should be excluded from the CIDR range specified in CIDR.
+                            Each CIDR must be a valid IPv4 CIDR in the format of x.x.x.x/y where x is 0-255 and y is 0-32.
+                          items:
+                            type: string
+                          type: array
+                      required:
+                      - cidr
+                      type: object
+                    ports:
+                      items:
+                        properties:
+                          port:
+                            format: int32
+                            maximum: 65535
+                            minimum: 1
+                            type: integer
+                          protocol:
+                            enum:
+                            - IP
+                            - TCP
+                            - UDP
+                            - ICMP
+                            type: string
+                        required:
+                        - port
+                        - protocol
+                        type: object
+                      type: array
+                    targetSelector:
+                      additionalProperties:
+                        type: string
+                      type: object
+                  required:
+                  - direction
+                  type: object
+                type: array
+              process:
+                items:
+                  properties:
+                    dir:
+                      pattern: ^/
+                      type: string
+                    fromSource:
+                      items:
+                        properties:
+                          name:
+                            pattern: ^[^/]+$
+                            type: string
+                          path:
+                            pattern: ^/
+                            type: string
+                        required:
+                        - name
+                        - path
+                        type: object
+                      type: array
+                    name:
+                      pattern: ^[^/]+$
+                      type: string
+                    path:
+                      pattern: ^/
+                      type: string
+                    recursive:
+                      type: boolean
+                  type: object
+                type: array
+              selector:
+                additionalProperties:
+                  type: string
+                type: object
+            required:
+            - action
+            type: object
+          status:
+            description: KubeFortPolicyStatus defines the observed state of KubeFortPolicy.
+            properties:
+              status:
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
